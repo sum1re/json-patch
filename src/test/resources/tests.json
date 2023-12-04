@@ -1,0 +1,198 @@
+[
+  {
+    "comment":"add nonexistent field",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}],"email":"tub@ft.com"},
+    "patch":[{"op":"add","path":"/email","value":"tub@ft.com"}] 
+  },
+  {
+    "comment":"add number field to object",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"0":"tub@ft.com","id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"add","path":"/0","value":"tub@ft.com"}] 
+  },
+  {
+    "comment":"replace existing field",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":25,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"replace","path":"/age","value": 25}] 
+  },
+  {
+    "comment":"replace nonexistent field",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"replace","path":"/email","value":"tub@ft.com"}],
+    "error":"Missing \"path\" property: email" 
+  },
+  {
+    "comment":"replace null to nonnull value",
+    "doc":{"id":1,"age":30,"name":null,"friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"replace","path":"/name","value":"John"}] 
+  },
+  {
+    "comment":"replace nonnull to null value",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":null,"friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"replace","path":"/name","value":null}] 
+  },
+  {
+    "comment":"add existing field, same with 'replace'",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":25,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"add","path":"/age","value":25}] 
+  },
+  {
+    "comment":"move field to another one",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"friends":[{"id":10,"name":"Colon"}],"firstName":"John"},
+    "patch":[{"op":"move","path":"/firstName","from":"/name"}] 
+  },
+  {
+    "comment":"missing \"from\" to move",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"move","path":"/firstName"}],
+    "error":"The \"from\" MUST exist for \"copy\" and \"move\" operation." 
+  },
+  {
+    "comment":"nonexistent \"from\" field",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"move","path":"/validMail","from":"/email"}],
+    "error":"Missing path property: /email" 
+  },
+  {
+    "comment":"add nonexistent field in array",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon","age":25}]},
+    "patch":[{"op":"add","path":"/friends/0/age","value":25}] 
+  },
+  {
+    "comment":"add object to array",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"},{"id":11,"name":"Rhodie"}]},
+    "patch":[{"op":"add","path":"/friends/1","value":{"id":11,"name":"Rhodie"}}] 
+  },
+  {
+    "comment":"add a array as value to object",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}],"fruits":["apple"]},
+    "patch":[{"op":"add","path":"/fruits","value":["apple"]}] 
+  },
+  {
+    "comment":"remove object in array",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":"John","friends":[]},
+    "patch":[{"op":"remove","path":"/friends/0"}] 
+  },
+  {
+    "comment":"remove a field for object in array",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":"John","friends":[{"id":10}]},
+    "patch":[{"op":"remove","path":"/friends/0/name"}] 
+  },
+  {
+    "comment":"remove existing field",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":"John"},
+    "patch":[{"op":"remove","path":"/friends"}] 
+  },
+  {
+    "comment":"remove nonexistent field",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"remove","path":"/email"}],
+    "error":"Missing \"path\" property: email" 
+  },
+  {
+    "comment":"remove deep nonexistent field",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"remove","path":"/fruits/name"}],
+    "error":"Missing \"path\" property: /fruits" 
+  },
+  {
+    "comment":"copy to another field",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "expected":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}],"bestFriend":{"id":10,"name":"Colon"}},
+    "patch":[{"op":"copy","path":"/bestFriend","from":"/friends/0"}] 
+  },
+  {
+    "comment":"remove nonexistent index, out of bounds",
+    "doc":["apple","banana"],
+    "patch":[{"op":"remove","path":"/3"}],
+    "error":"Index out of bounds: 3" 
+  },
+  {
+    "comment":"remove nonexistent index, negative number",
+    "doc":["apple","banana"],
+    "patch":[{"op":"remove","path":"/-1"}],
+    "error":"Invalid array index: -1" 
+  },
+  {
+    "comment":"remove nonexistent index, bad number",
+    "doc":["apple","banana"],
+    "patch":[{"op":"remove","path":"/le0"}],
+    "error":"Invalid array index: le0" 
+  },
+  {
+    "comment":"add value to array at index",
+    "doc":["apple","strawberry"],
+    "expected":["apple","banana","strawberry"],
+    "patch":[{"op":"replace","path":"/1","value":"banana"},{"op":"add","path":"/2","value":"strawberry"}] 
+  },
+  {"comment":"add value to array at -",
+    "doc":[],
+    "expected":["banana"],
+    "patch":[{"op":"add","path":"/-","value":"banana"}] 
+  },
+  {
+    "comment":"add value to array at index, out of bounds",
+    "doc":["apple"],
+    "patch":[{"op":"add","path":"/2","value":"banana"}],
+    "error":"Index out of bounds: 2" 
+  },
+  {
+    "comment":"object filed on array",
+    "doc":["apple"],
+    "patch":[{"op":"add","path":"/name","value":"banana"}],
+    "error":"Invalid array index: name" 
+  },
+  {
+    "comment":"add value to object, slash as path",
+    "doc":{},
+    "expected":{"":"John"},
+    "patch":[{"op":"add","path":"/","value":"John"}] 
+  },
+  {
+    "comment":"add value to object, nested slash",
+    "doc":{"fruits":{}},
+    "expected":{"fruits":{"":"apple"}},
+    "patch":[{"op":"add","path":"/fruits/","value":"apple"}] 
+  },
+  {
+    "comment":"replace value in array",
+    "doc":["apple"],
+    "expected":["banana"],
+    "patch":[{"op":"replace","path":"/0","value":"banana"}]
+  },
+  {
+    "comment":"replace a array to value in array",
+    "doc":["apple","banana"],
+    "expected":["apple",["Colon","Rhodie"]],
+    "patch":[{"op":"replace","path":"/1","value":["Colon","Rhodie"]}] 
+  },
+  {
+    "comment":"replace whole document",
+    "doc":{"name":"John"},
+    "expected":{"fruits":"apple"},
+    "patch":[{"op":"remove","path":"/name"},{"op":"add","path":"/fruits","value":"apple"}] 
+  },
+  {
+    "comment":"path not start with slash",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"add","path":"email","value":"tub@ft.com"}],
+    "error":"Invalid path property, it should start with a slash" 
+  },
+  {
+    "comment":"path not start with slash",
+    "doc":{"id":1,"age":30,"name":"John","friends":[{"id":10,"name":"Colon"}]},
+    "patch":[{"op":"add","path":"email","value":"tub@ft.com"}],
+    "error":"Invalid path property, it should start with a slash"}
+]
